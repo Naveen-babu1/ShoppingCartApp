@@ -78,7 +78,26 @@ class GroceryProduct extends Product {
 }
 
 class CartItem {
+    private Product product;
+    private int quantity;
 
+    public CartItem(Product product, int quantity) {
+        this.product = product;
+        this.quantity = quantity;
+    }
+
+    public Product getProduct() { return product; }
+    public int getQuantity() { return quantity; }
+    public void incrementQuantity() { quantity++; }
+    public void decrementQuantity() { if (quantity > 1) quantity--; }
+    public double getTotalPrice(double rate) {
+        return product.getPrice() * quantity * rate;
+    }
+
+    @Override
+    public String toString() {
+        return product.getName() + " x" + quantity;
+    }
 }
 
 public class ShoppingCartApp extends Application {
@@ -89,6 +108,30 @@ public class ShoppingCartApp extends Application {
     }
 
     private void showLogin(Stage primaryStage) {
+        Label userLabel = new Label("Username:");
+        TextField userField = new TextField();
+        Label passLabel = new Label("Password:");
+        PasswordField passField = new PasswordField();
+        Button loginButton = new Button("Login");
+        Label messageLabel = new Label();
+
+        loginButton.setOnAction(e -> {
+            String username = userField.getText();
+            String password = passField.getText();
+            if ("admin".equals(username) && "admin123".equals(password)) {
+                startMainApp(primaryStage); // Launch main app
+            } else {
+                messageLabel.setText("Invalid credentials.");
+            }
+        });
+
+        VBox loginBox = new VBox(10, userLabel, userField, passLabel, passField, loginButton, messageLabel);
+        loginBox.setPadding(new Insets(20));
+        Scene loginScene = new Scene(loginBox, 400, 300);
+
+        primaryStage.setTitle("Admin Login");
+        primaryStage.setScene(loginScene);
+        primaryStage.show();
 
     }
 
