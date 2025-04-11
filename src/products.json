@@ -1,0 +1,23 @@
+[
+  { "type": "electronics", "name": "Laptop", "price": 999.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/1792/1792816.png" },
+  { "type": "electronics", "name": "Headphones", "price": 89.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/3144/3144469.png" },
+  { "type": "electronics", "name": "Smartphone", "price": 749.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/833/833472.png" },
+  { "type": "electronics", "name": "Smartwatch", "price": 199.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/2891/2891541.png" },
+  { "type": "electronics", "name": "Bluetooth Speaker", "price": 49.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/2480/2480431.png" },
+  { "type": "electronics", "name": "Tablet", "price": 599.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/4213/4213174.png" },
+  { "type": "electronics", "name": "Gaming Console", "price": 399.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/3514/3514491.png" },
+  { "type": "electronics", "name": "Camera", "price": 499.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/2933/2933884.png" },
+  { "type": "electronics", "name": "Drone", "price": 899.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/810/810104.png" },
+  { "type": "electronics", "name": "Wireless Mouse", "price": 29.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/3039/3039434.png" },
+
+  { "type": "grocery", "name": "Apples", "price": 3.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/415/415733.png" },
+  { "type": "grocery", "name": "Milk", "price": 2.49, "imageUrl": "https://cdn-icons-png.flaticon.com/512/590/590685.png" },
+  { "type": "grocery", "name": "Bread", "price": 1.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/924/924514.png" },
+  { "type": "grocery", "name": "Eggs", "price": 2.99, "imageUrl": "https://cdn-icons-png.flaticon.com/512/706/706164.png" },
+  { "type": "grocery", "name": "Orange Juice", "price": 3.49, "imageUrl": "https://cdn-icons-png.flaticon.com/512/992/992705.png" },
+  { "type": "grocery", "name": "Bananas", "price": 1.29, "imageUrl": "https://cdn-icons-png.flaticon.com/512/415/415682.png" },
+  { "type": "grocery", "name": "Tomatoes", "price": 2.19, "imageUrl": "https://cdn-icons-png.flaticon.com/512/590/590705.png" },
+  { "type": "grocery", "name": "Potatoes", "price": 1.49, "imageUrl": "https://cdn-icons-png.flaticon.com/512/1046/1046857.png" },
+  { "type": "grocery", "name": "Cheese", "price": 4.29, "imageUrl": "https://cdn-icons-png.flaticon.com/512/2976/2976283.png" },
+  { "type": "grocery", "name": "Carrots", "price": 1.79, "imageUrl": "https://cdn-icons-png.flaticon.com/512/590/590703.png" }
+]
