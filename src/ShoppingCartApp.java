@@ -386,7 +386,12 @@ public class ShoppingCartApp extends Application {
     }
 
     private void setupProductSearch(TextField searchField, FilteredList<Product> filteredElectronics, FilteredList<Product> filteredGroceries) {
-
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            String filter = newVal.toLowerCase();
+            Predicate<Product> predicate = product -> product.getName().toLowerCase().contains(filter);
+            filteredElectronics.setPredicate(predicate);
+            filteredGroceries.setPredicate(predicate);
+        });
     }
 
     private void reduceStock() {
