@@ -361,40 +361,136 @@ public class ShoppingCartApp extends Application {
     }
 
     private void applyCoupon(String code) {
-
+        if (code.equalsIgnoreCase(VALID_COUPON) && !couponApplied) {
+            couponApplied = true;
+            showAlert("Coupon Applied", "10% discount applied!");
+            updateTotal();
+        } else if (couponApplied) {
+            showAlert("Already Applied", "Coupon has already been used.");
+        } else {
+            showAlert("Invalid Coupon", "Please enter a valid coupon code.");
+        }
     }
 
 
     private void updateTotal() {
-
+        double total = cart.stream().mapToDouble(ci -> ci.getProduct().getPrice() * ci.getQuantity() * conversionRate).sum();
+        if (couponApplied) {
+            couponDiscount = total * 0.10;
+            total -= couponDiscount;
+            totalLabel.setText(String.format("Total: %s %.2f (10%% off)", currentCurrency, total));
+        } else {
+            totalLabel.setText(String.format("Total: %s %.2f", currentCurrency, total));
+        }
     }
 
     private void updateCurrency(String currency) {
+        try {
+            String apiKey = "f29cdcc22808a5da29fba2b8"; // Replace with your API key from exchangerate-api.com
+            String urlStr = "https://v6.exchangerate-api.com/v6/" + apiKey + "/pair/USD/" + currency;
+            HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
+            conn.setRequestMethod("GET");
 
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) response.append(line);
+            in.close();
+
+            Gson gson = new Gson();
+            Map<?, ?> jsonMap = gson.fromJson(response.toString(), Map.class);
+            conversionRate = ((Number) jsonMap.get("conversion_rate")).doubleValue();
+            currentCurrency = currency;
+            updatePriceDisplay();
+        } catch (Exception e) {
+            showAlert("Error", "Failed to fetch currency conversion.");
+        }
     }
 
     private void updatePriceDisplay() {
-
+        electronicsListView.setCellFactory(param -> createCurrencyImageCell());
+        groceriesListView.setCellFactory(param -> createCurrencyImageCell());
+        cartListView.refresh();
+        updateTotal();
     }
 
     private ListCell<Product> createCurrencyImageCell() {
-        return null;
+        return new ListCell<>() {
+            private final ImageView imageView = new ImageView();
+            @Override
+            protected void updateItem(Product item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    double convertedPrice = item.getPrice() * conversionRate;
+                    setText(item.getName() + " (" + currentCurrency + " " + String.format("%.2f", convertedPrice) + ") - Stock: " + item.getStock());
+                    imageView.setImage(new Image(item.getImageUrl(), 40, 40, true, true));
+                    setGraphic(imageView);
+                }
+            }
+        };
     }
 
     private void saveCart() {
+        try (Writer writer = new FileWriter(CART_FILE)) {
+            RuntimeTypeAdapterFactory<Product> productAdapterFactory = RuntimeTypeAdapterFactory
+                    .of(Product.class, "type")
+                    .registerSubtype(ElectronicsProduct.class, "electronics")
+                    .registerSubtype(GroceryProduct.class, "grocery");
 
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapterFactory(productAdapterFactory)
+                    .create();
+
+            gson.toJson(cart, writer);
+            showAlert("Success", "Cart saved successfully.");
+        } catch (IOException e) {
+            showAlert("Error", "Failed to save cart.");
+        }
     }
 
     private void loadCart() {
+        try (Reader reader = new FileReader(CART_FILE)) {
+            RuntimeTypeAdapterFactory<Product> productAdapterFactory = RuntimeTypeAdapterFactory
+                    .of(Product.class, "type")
+                    .registerSubtype(ElectronicsProduct.class, "electronics")
+                    .registerSubtype(GroceryProduct.class, "grocery");
 
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapterFactory(productAdapterFactory)
+                    .create();
+
+            Type type = new TypeToken<List<CartItem>>() {}.getType();
+            List<CartItem> loaded = gson.fromJson(reader, type);
+            cart.setAll(loaded);
+            updateStockAfterLoad(loaded);
+            cartListView.refresh();
+            updateTotal();
+            showAlert("Success", "Cart loaded successfully.");
+        } catch (IOException e) {
+            showAlert("Error", "Failed to load cart.");
+        }
 
     }
 
     private void generateReceipt() {
-
+        StringBuilder sb = new StringBuilder("Receipt:\n");
+        for (CartItem ci : cart) {
+            double lineTotal = ci.getProduct().getPrice() * ci.getQuantity() * conversionRate;
+            sb.append(String.format("%s x%d - %s %.2f\n",
+                    ci.getProduct().getName(), ci.getQuantity(), currentCurrency, lineTotal));
+        }
+        sb.append(totalLabel.getText());
+        showAlert("Receipt", sb.toString());
     }
 
     private void showAlert(String title, String message) {
-
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
