@@ -369,7 +369,20 @@ public class ShoppingCartApp extends Application {
     }
 
     private void clearCart() {
-
+        for (CartItem item : cart) {
+            Product matchedProduct = findProductInInventory(item.getProduct());
+            if (matchedProduct != null) {
+                matchedProduct.increaseStock(item.getQuantity());
+            }
+        }
+        cart.clear();
+        couponApplied = false;
+        couponDiscount = 0.0;
+        updateTotal();
+        cartListView.refresh();
+        electronicsListView.refresh();
+        groceriesListView.refresh();
+        showAlert("Cart Cleared", "Your cart has been emptied.");
     }
 
     private void setupProductSearch(TextField searchField, FilteredList<Product> filteredElectronics, FilteredList<Product> filteredGroceries) {
