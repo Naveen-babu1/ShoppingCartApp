@@ -353,6 +353,10 @@ public class ShoppingCartApp extends Application {
         return null;
     }
 
+    private void updateStockAfterLoad() {
+       
+    }
+
 
     private void applyCoupon(String code) {
         if (code.equalsIgnoreCase(VALID_COUPON) && !couponApplied) {
