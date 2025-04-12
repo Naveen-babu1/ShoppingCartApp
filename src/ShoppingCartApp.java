@@ -363,7 +363,9 @@ public class ShoppingCartApp extends Application {
     }
 
     private void undo() {
-
+        if (!undoStack.isEmpty()) {
+            undoStack.pop().run();
+        }
     }
 
     private void clearCart() {
