@@ -394,8 +394,10 @@ public class ShoppingCartApp extends Application {
         });
     }
 
-    private void reduceStock() {
-
+    private void reduceStock(Product product) {
+        product.decreaseStock();
+        electronicsListView.refresh();
+        groceriesListView.refresh();
     }
 
     private boolean isInStock() {
