@@ -323,7 +323,7 @@ public class ShoppingCartApp extends Application {
 
     
 
-    private void removeLastInstanceOf() {
+    private void removeLastInstanceOf(Product product) {
         for (CartItem ci : cart) {
             if (ci.getProduct().equals(product)) {
                 if (ci.getQuantity() == 1) cart.remove(ci);
