@@ -129,6 +129,11 @@ public class ShoppingCartApp extends Application {
     }
 
     private void showLogin(Stage primaryStage) {
+
+        Image logoImage = new Image(getClass().getResource("/assets/shoppinglogo.png").toExternalForm());
+        ImageView logoView = new ImageView(logoImage);
+        logoView.setFitHeight(80);
+        logoView.setPreserveRatio(true);
         Label userLabel = new Label("Username:");
         TextField userField = new TextField();
         Label passLabel = new Label("Password:");
@@ -146,9 +151,9 @@ public class ShoppingCartApp extends Application {
             }
         });
 
-        VBox loginBox = new VBox(10, userLabel, userField, passLabel, passField, loginButton, messageLabel);
+        VBox loginBox = new VBox(10, logoView, userLabel, userField, passLabel, passField, loginButton, messageLabel);
         loginBox.setPadding(new Insets(20));
-        Scene loginScene = new Scene(loginBox, 400, 300);
+        Scene loginScene = new Scene(loginBox, 400, 400);
 
         primaryStage.setTitle("Admin Login");
         primaryStage.setScene(loginScene);
@@ -170,7 +175,8 @@ public class ShoppingCartApp extends Application {
                 String type = obj.get("type").getAsString();
                 String name = obj.get("name").getAsString();
                 double price = obj.get("price").getAsDouble();
-                String imageUrl = obj.get("imageUrl").getAsString();
+                String imageFile = obj.get("imageUrl").getAsString();
+                String imageUrl = getClass().getResource("/assets/" + imageFile).toExternalForm();
 
                 if ("electronics".equalsIgnoreCase(type)) {
                     electronics.add(new ElectronicsProduct(name, price, imageUrl));
@@ -543,15 +549,47 @@ public class ShoppingCartApp extends Application {
     }
 
     private void generateReceipt() {
-        StringBuilder sb = new StringBuilder("Receipt:\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("==== Welcome to SmartCart Store ====\n");
+        sb.append("Date: ").append(java.time.LocalDate.now())
+                .append("  Time: ").append(java.time.LocalTime.now().withNano(0)).append("\n\n");
+
+        sb.append(String.format("%-15s %5s %10s %12s\n", "Item", "Qty", "Price", "Total"));
+        sb.append("--------------------------------------------------\n");
+
+        double subtotal = 0;
         for (CartItem ci : cart) {
-            double lineTotal = ci.getProduct().getPrice() * ci.getQuantity() * conversionRate;
-            sb.append(String.format("%s x%d - %s %.2f\n",
-                    ci.getProduct().getName(), ci.getQuantity(), currentCurrency, lineTotal));
+            String name = ci.getProduct().getName();
+            int qty = ci.getQuantity();
+            double price = ci.getProduct().getPrice() * conversionRate;
+            double total = price * qty;
+            subtotal += total;
+
+            sb.append(String.format("%-15s %5d %10.2f %12.2f\n", name, qty, price, total));
         }
-        sb.append(totalLabel.getText());
+
+        sb.append("--------------------------------------------------\n");
+        sb.append(String.format("%-32s %12.2f\n", "Subtotal:", subtotal));
+
+        if (couponApplied) {
+            double discount = subtotal * 0.10;
+            subtotal -= discount;
+            sb.append(String.format("%-32s -%11.2f\n", "Coupon (SAVE10):", discount));
+        }
+
+        sb.append("--------------------------------------------------\n");
+        sb.append(String.format("%-32s %12.2f\n", "TOTAL:", subtotal));
+        sb.append("Currency: ").append(currentCurrency).append("\n\n");
+
+        sb.append("Thank you for shopping with us!\n");
+        sb.append("==========================================\n");
+
         showAlert("Receipt", sb.toString());
     }
+
+
+
+
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
