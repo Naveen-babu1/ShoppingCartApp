@@ -48,9 +48,41 @@ public class ShoppingCartApp extends Application {
     }
 
     private void addToCartFromTab() {
+            Product selected = null;
 
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab.getText().equals("Electronics")) {
+            selected = electronicsListView.getSelectionModel().getSelectedItem();
+        } else if (selectedTab.getText().equals("Groceries")) {
+            selected = groceriesListView.getSelectionModel().getSelectedItem();
+        }
+
+        if (selected != null) {
+            if (!isInStock(selected)) {
+                showAlert("Out of Stock", "This product is out of stock.");
+                return;
+            }
+            final Product selectedFinal = selected;
+
+            Optional<CartItem> existing = cart.stream()
+                    .filter(ci -> ci.getProduct().equals(selectedFinal))
+                    .findFirst();
+
+            if (existing.isPresent()) {
+                existing.get().incrementQuantity();
+            } else {
+                cart.add(new CartItem(selectedFinal, 1));
+            }
+
+            reduceStock(selectedFinal);
+            undoStack.push(() -> removeLastInstanceOf(selectedFinal));
+            cartListView.refresh();
+            updateTotal();
+        }
 
     }
+
+    
 
     private void removeLastInstanceOf() {
 
