@@ -336,7 +336,30 @@ public class ShoppingCartApp extends Application {
     }
 
     private void removeFromCart() {
+         CartItem selected = cartListView.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            cart.remove(selected);
 
+            Product matchedProduct = findProductInInventory(selected.getProduct());
+            if (matchedProduct != null) {
+                matchedProduct.increaseStock(selected.getQuantity());
+            }
+
+            undoStack.push(() -> {
+                cart.add(selected);
+                Product undoProduct = findProductInInventory(selected.getProduct());
+                if (undoProduct != null) {
+                    undoProduct.reduceStockBy(selected.getQuantity());
+                }
+                cartListView.refresh();
+                updateTotal();
+            });
+
+            electronicsListView.refresh();
+            groceriesListView.refresh();
+            cartListView.refresh();
+            updateTotal();
+        }
     }
 
     private void undo() {
