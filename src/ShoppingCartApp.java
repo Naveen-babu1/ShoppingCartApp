@@ -400,8 +400,8 @@ public class ShoppingCartApp extends Application {
         groceriesListView.refresh();
     }
 
-    private boolean isInStock() {
-        return false;
+     private boolean isInStock(Product product) {
+        return product.getStock() > 0;
     }
 
     private Product findProductInInventory() {
