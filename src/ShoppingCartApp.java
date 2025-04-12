@@ -415,8 +415,16 @@ public class ShoppingCartApp extends Application {
     }
 
 
-    private void updateStockAfterLoad() {
-
+     private void updateStockAfterLoad(List<CartItem> loadedCart) {
+        for (CartItem item : loadedCart) {
+            Product matchedProduct = findProductInInventory(item.getProduct());
+            if (matchedProduct != null) {
+                matchedProduct.reduceStockBy(item.getQuantity());
+            }
+        }
+        electronicsListView.refresh();
+        groceriesListView.refresh();
+        cartListView.refresh();
     }
 
     private void applyCoupon(String code) {
