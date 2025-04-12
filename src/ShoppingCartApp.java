@@ -404,7 +404,13 @@ public class ShoppingCartApp extends Application {
         return product.getStock() > 0;
     }
 
-    private Product findProductInInventory() {
+    private Product findProductInInventory(Product target) {
+        for (Product p : electronics) {
+            if (p.equals(target)) return p;
+        }
+        for (Product p : groceries) {
+            if (p.equals(target)) return p;
+        }
         return null;
     }
 
