@@ -324,40 +324,107 @@ public class ShoppingCartApp extends Application {
     
 
     private void removeLastInstanceOf() {
-
+        for (CartItem ci : cart) {
+            if (ci.getProduct().equals(product)) {
+                if (ci.getQuantity() == 1) cart.remove(ci);
+                else ci.decrementQuantity();
+                break;
+            }
+        }
+        cartListView.refresh();
+        updateTotal();
     }
 
     private void removeFromCart() {
+         CartItem selected = cartListView.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            cart.remove(selected);
 
+            Product matchedProduct = findProductInInventory(selected.getProduct());
+            if (matchedProduct != null) {
+                matchedProduct.increaseStock(selected.getQuantity());
+            }
+
+            undoStack.push(() -> {
+                cart.add(selected);
+                Product undoProduct = findProductInInventory(selected.getProduct());
+                if (undoProduct != null) {
+                    undoProduct.reduceStockBy(selected.getQuantity());
+                }
+                cartListView.refresh();
+                updateTotal();
+            });
+
+            electronicsListView.refresh();
+            groceriesListView.refresh();
+            cartListView.refresh();
+            updateTotal();
+        }
     }
 
     private void undo() {
-
+        if (!undoStack.isEmpty()) {
+            undoStack.pop().run();
+        }
     }
 
     private void clearCart() {
-
+        for (CartItem item : cart) {
+            Product matchedProduct = findProductInInventory(item.getProduct());
+            if (matchedProduct != null) {
+                matchedProduct.increaseStock(item.getQuantity());
+            }
+        }
+        cart.clear();
+        couponApplied = false;
+        couponDiscount = 0.0;
+        updateTotal();
+        cartListView.refresh();
+        electronicsListView.refresh();
+        groceriesListView.refresh();
+        showAlert("Cart Cleared", "Your cart has been emptied.");
     }
 
     private void setupProductSearch(TextField searchField, FilteredList<Product> filteredElectronics, FilteredList<Product> filteredGroceries) {
-
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            String filter = newVal.toLowerCase();
+            Predicate<Product> predicate = product -> product.getName().toLowerCase().contains(filter);
+            filteredElectronics.setPredicate(predicate);
+            filteredGroceries.setPredicate(predicate);
+        });
     }
 
-    private void reduceStock() {
-
+    private void reduceStock(Product product) {
+        product.decreaseStock();
+        electronicsListView.refresh();
+        groceriesListView.refresh();
     }
 
-    private boolean isInStock() {
-        return false;
+     private boolean isInStock(Product product) {
+        return product.getStock() > 0;
     }
 
-    private Product findProductInInventory() {
+    private Product findProductInInventory(Product target) {
+        for (Product p : electronics) {
+            if (p.equals(target)) return p;
+        }
+        for (Product p : groceries) {
+            if (p.equals(target)) return p;
+        }
         return null;
     }
 
 
-    private void updateStockAfterLoad() {
-
+     private void updateStockAfterLoad(List<CartItem> loadedCart) {
+        for (CartItem item : loadedCart) {
+            Product matchedProduct = findProductInInventory(item.getProduct());
+            if (matchedProduct != null) {
+                matchedProduct.reduceStockBy(item.getQuantity());
+            }
+        }
+        electronicsListView.refresh();
+        groceriesListView.refresh();
+        cartListView.refresh();
     }
 
     private void applyCoupon(String code) {
